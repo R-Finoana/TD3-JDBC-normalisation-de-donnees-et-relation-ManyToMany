@@ -7,3 +7,6 @@ create table dish_ingredient(
     quantity_required numeric,
     unit unit_type
 );
+
+ALTER TABLE ingredient DROP COLUMN IF EXISTS id_dish;
+ALTER TABLE ingredient DROP COLUMN IF EXISTS required_quantity;
