@@ -23,3 +23,16 @@ update dish
 set price = 6000.0
 where id = 2;
 
+insert into dish_ingredient(id, id_dish, id_ingredient, quantity_required, unit)
+values (1, 1, 1, 0.20, 'KG'),
+       (2, 1, 2, 0.15, 'KG'),
+       (3, 2, 3, 1.00, 'KG'),
+       (4, 4, 4, 0.30, 'KG'),
+       (5, 4, 5, 0.20, 'KG');
+
+update dish SET price=3500.00 where id=1;
+update dish SET price=12000.00 where id=2;
+update dish SET price=null where id=3;
+update dish SET price=8000.00 where id=4;
+update dish SET price=null where id=5;
+
