@@ -5,14 +5,14 @@ public class DishIngredient {
     private Integer idDish;
     private Integer idIngredient;
     private Double quantityRequired;
-    private UnitType unit;
+    private UnitTypeEnum unit;
 
     private Ingredient ingredient;
 
     public DishIngredient() {
     }
 
-    public DishIngredient(Integer idDish, Integer idIngredient, Double quantityRequired, UnitType unit, Ingredient ingredient) {
+    public DishIngredient(Integer idDish, Integer idIngredient, Double quantityRequired, UnitTypeEnum unit, Ingredient ingredient) {
         this.idDish = idDish;
         this.idIngredient = idIngredient;
         this.quantityRequired = quantityRequired;
@@ -52,11 +52,11 @@ public class DishIngredient {
         this.quantityRequired = quantityRequired;
     }
 
-    public UnitType getUnit() {
+    public UnitTypeEnum getUnit() {
         return unit;
     }
 
-    public void setUnit(UnitType unit) {
+    public void setUnit(UnitTypeEnum unit) {
         this.unit = unit;
     }
 
