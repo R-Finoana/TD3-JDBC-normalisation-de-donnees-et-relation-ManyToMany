@@ -10,3 +10,5 @@ create table dish_ingredient(
 
 ALTER TABLE ingredient DROP COLUMN IF EXISTS id_dish;
 ALTER TABLE ingredient DROP COLUMN IF EXISTS required_quantity;
+
+ALTER TABLE dish RENAME COLUMN price TO selling_price;
