@@ -12,20 +12,22 @@ public class Dish {
         return sellingPrice;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Double sellingPrice) {
         this.sellingPrice = sellingPrice;
     }
 
     public Double getDishCost() {
-        double totalPrice = 0;
-        for (int i = 0; i < dishIngredients.size(); i++) {
-            Double quantity = dishIngredients.get(i).getQuantityRequired();
-            if(quantity == null) {
-                throw new RuntimeException("...");
-            }
-            totalPrice = totalPrice + dishIngredients.get(i).getPrice() * quantity;
+        if(dishIngredients == null || dishIngredients.isEmpty()){
+            return 0.0;
         }
-        return totalPrice;
+        double totalCost = 0.0;
+        for (DishIngredient di : dishIngredients) {
+            if (di.getQuantityRequired() == null) {
+                throw new RuntimeException("Quantity required is null for ingredient " + di.getIdIngredient());
+            }
+            totalCost += di.getIngredient().getPrice() * di.getQuantityRequired();
+        }
+        return totalCost;
     }
 
     public Dish() {
@@ -83,7 +85,7 @@ public class Dish {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Dish dish = (Dish) o;
-        return Objects.equals(id, dish.id) && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(ingredients, dish.ingredients);
+        return Objects.equals(id, dish.id) && Objects.equals(sellingPrice, dish.sellingPrice) && Objects.equals(name, dish.name) && dishType == dish.dishType && Objects.equals(dishIngredients, dish.dishIngredients);
     }
 
     @Override
