@@ -10,7 +10,7 @@ public class DataRetriever {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     """
-                            select dish.id as dish_id, dish.name as dish_name, dish_type, dish.price as dish_price
+                            select dish.id as dish_id, dish.name as dish_name, dish_type, dish.selling_price as selling_price
                             from dish
                             where dish.id = ?;
                             """);
@@ -21,15 +21,58 @@ public class DataRetriever {
                 dish.setId(resultSet.getInt("dish_id"));
                 dish.setName(resultSet.getString("dish_name"));
                 dish.setDishType(DishTypeEnum.valueOf(resultSet.getString("dish_type")));
-                dish.setPrice(resultSet.getObject("dish_price") == null
-                        ? null : resultSet.getDouble("dish_price"));
-                dish.setIngredients(findIngredientByDishId(id));
+                dish.setSellingPrice(resultSet.getObject("selling_price") == null
+                        ? null : resultSet.getDouble("selling_price"));
+                dish.setDishIngredients(findDishIngredientsByDishId(id));
                 return dish;
             }
             dbConnection.closeConnection(connection);
             throw new RuntimeException("Dish not found " + id);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private List<DishIngredient> findDishIngredientsByDishId(Integer dishId){
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = null;
+        try{
+            String sql = """
+            SELECT di.id, di.id_dish, di.id_ingredient, di.quantity_required, di.unit,
+                   i.name, i.category, i.price
+            FROM dish_ingredient di
+            JOIN ingredient i ON di.id_ingredient = i.id
+            WHERE di.id_dish = ?
+            """;
+            connection = dbConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, dishId);
+
+            ResultSet rs = stmt.executeQuery();
+            List<DishIngredient> dishIngredients = new ArrayList<>();
+
+            while(rs.next()){
+                DishIngredient di = new DishIngredient();
+                di.setId(rs.getInt("id"));
+                di.setIdDish(rs.getInt("id_dish"));
+                di.setIdIngredient(rs.getInt("id_ingredient"));
+                di.setQuantityRequired(rs.getDouble("quantity_required"));
+                di.setUnit(UnitTypeEnum.valueOf(rs.getString("unit")));
+
+                Ingredient ingredient = new Ingredient();
+                ingredient.setId(di.getIdIngredient());
+                ingredient.setName(rs.getString("name"));
+                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+                ingredient.setPrice(rs.getDouble("price"));
+                di.setIngredient(ingredient);
+
+                dishIngredients.add(di);
+            }
+            return dishIngredients;
+        } catch (SQLException e){
+            throw new RuntimeException("Error retrieving DishIngredient for the dish "+dishId, e);
+        } finally {
+            dbConnection.closeConnection(connection);
         }
     }
 
