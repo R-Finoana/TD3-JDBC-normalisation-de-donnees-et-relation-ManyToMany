@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
         // Log before changes
@@ -39,5 +42,22 @@ public class Main {
         } catch (RuntimeException e) {
             System.out.println("Exception for Riz: " + e.getMessage());
         }
+
+        System.out.println("\n--Test for saveDish--");
+        Dish updatedSalade = new Dish();
+        updatedSalade.setId(1);
+        updatedSalade.setName("Salade fraîche updated");
+        updatedSalade.setDishType(DishTypeEnum.STARTER);
+        updatedSalade.setSellingPrice(4000.0);
+        System.out.println("\n--Add dishIngredient--");
+        List<DishIngredient> dis = new ArrayList<>();
+        dis.add(new DishIngredient(1, 1, 0.25, UnitTypeEnum.KG));
+        dis.add(new DishIngredient(1, 2, 0.10, UnitTypeEnum.KG));
+        updatedSalade.setDishIngredients(dis);
+
+        Dish saved = dataRetriever.saveDish(updatedSalade);
+        System.out.println("Saved dish: " + saved);
+        System.out.println("New cost: " + saved.getDishCost());
+        System.out.println("New margin: " + saved.getGrossMargin());
     }
 }
