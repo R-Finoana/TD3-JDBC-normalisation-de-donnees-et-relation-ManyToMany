@@ -8,13 +8,6 @@ public class Dish {
     private DishTypeEnum dishType;
     private List<DishIngredient> dishIngredients;
 
-    public Double getPrice() {
-        return sellingPrice;
-    }
-
-    public void setPrice(Double sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
 
     public Double getDishCost() {
         if(dishIngredients == null || dishIngredients.isEmpty()){
