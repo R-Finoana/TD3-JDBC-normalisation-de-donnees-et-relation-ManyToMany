@@ -78,11 +78,12 @@ public class DataRetriever {
 
     Dish saveDish(Dish toSave) {
         String upsertDishSql = """
-                    INSERT INTO dish (id, price, name, dish_type)
-                    VALUES (?, ?, ?, ?::dish_type)
+                    INSERT INTO dish (id, name, dish_type, selling_price)
+                    VALUES (?, ?, ?::dish_type, ?)
                     ON CONFLICT (id) DO UPDATE
                     SET name = EXCLUDED.name,
-                        dish_type = EXCLUDED.dish_type
+                        dish_type = EXCLUDED.dish_type,
+                        selling_price = EXCLUDED.selling_price
                     RETURNING id
                 """;
 
@@ -95,22 +96,21 @@ public class DataRetriever {
                 } else {
                     ps.setInt(1, getNextSerialValue(conn, "dish", "id"));
                 }
-                if (toSave.getPrice() != null) {
-                    ps.setDouble(2, toSave.getPrice());
+                ps.setString(2, toSave.getName());
+                ps.setString(3, toSave.getDishType().name());
+                if (toSave.getSellingPrice() != null) {
+                    ps.setDouble(4, toSave.getSellingPrice());
                 } else {
-                    ps.setNull(2, Types.DOUBLE);
+                    ps.setNull(4, Types.DOUBLE);
                 }
-                ps.setString(3, toSave.getName());
-                ps.setString(4, toSave.getDishType().name());
                 try (ResultSet rs = ps.executeQuery()) {
                     rs.next();
                     dishId = rs.getInt(1);
                 }
             }
 
-            List<Ingredient> newIngredients = toSave.getIngredients();
-            detachIngredients(conn, dishId, newIngredients);
-            attachIngredients(conn, dishId, newIngredients);
+            detachDishIngredients(conn, dishId);
+            attachDishIngredients(conn, dishId, toSave.getDishIngredients());
 
             conn.commit();
             return findDishById(dishId);
