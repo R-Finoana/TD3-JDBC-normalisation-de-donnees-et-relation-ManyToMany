@@ -23,7 +23,11 @@ public class DataRetriever {
                 dish.setDishType(DishTypeEnum.valueOf(resultSet.getString("dish_type")));
                 dish.setSellingPrice(resultSet.getObject("selling_price") == null
                         ? null : resultSet.getDouble("selling_price"));
-                dish.setDishIngredients(findDishIngredientsByDishId(id));
+                List<DishIngredient> associations = findDishIngredientsByDishId(id);
+                for(DishIngredient di : associations){
+                    di.setDish(dish);
+                }
+                dish.setDishIngredients(associations);
                 return dish;
             }
             dbConnection.closeConnection(connection);
