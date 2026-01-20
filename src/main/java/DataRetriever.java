@@ -38,8 +38,8 @@ public class DataRetriever {
         Connection connection = null;
         try{
             String sql = """
-            SELECT di.id, di.id_dish, di.id_ingredient, di.quantity_required, di.unit,
-                   i.name, i.category, i.price
+            SELECT di.quantity_required, di.unit,
+                   i.id AS ingredient_id, i.name AS ingredient_name, i.price, i.category
             FROM dish_ingredient di
             JOIN ingredient i ON di.id_ingredient = i.id
             WHERE di.id_dish = ?
@@ -53,17 +53,14 @@ public class DataRetriever {
 
             while(rs.next()){
                 DishIngredient di = new DishIngredient();
-                di.setId(rs.getInt("id"));
-                di.setIdDish(rs.getInt("id_dish"));
-                di.setIdIngredient(rs.getInt("id_ingredient"));
                 di.setQuantityRequired(rs.getDouble("quantity_required"));
                 di.setUnit(UnitTypeEnum.valueOf(rs.getString("unit")));
 
                 Ingredient ingredient = new Ingredient();
-                ingredient.setId(di.getIdIngredient());
-                ingredient.setName(rs.getString("name"));
-                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
+                ingredient.setId(rs.getInt("ingredient_id"));
+                ingredient.setName(rs.getString("ingredient_name"));
                 ingredient.setPrice(rs.getDouble("price"));
+                ingredient.setCategory(CategoryEnum.valueOf(rs.getString("category")));
                 di.setIngredient(ingredient);
 
                 dishIngredients.add(di);
