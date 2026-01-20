@@ -199,6 +199,7 @@ public class DataRetriever {
         }
     }
 
+    /**
     private List<Ingredient> findIngredientByDishId(Integer idDish) {
         DBConnection dbConnection = new DBConnection();
         Connection connection = dbConnection.getConnection();
@@ -206,7 +207,7 @@ public class DataRetriever {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     """
-                            select ingredient.id, ingredient.name, ingredient.price, ingredient.category, ingredient.required_quantity
+                            select ingredient.id, ingredient.name, ingredient.price, ingredient.category
                             from ingredient where id_dish = ?;
                             """);
             preparedStatement.setInt(1, idDish);
@@ -217,8 +218,6 @@ public class DataRetriever {
                 ingredient.setName(resultSet.getString("name"));
                 ingredient.setPrice(resultSet.getDouble("price"));
                 ingredient.setCategory(CategoryEnum.valueOf(resultSet.getString("category")));
-                Object requiredQuantity = resultSet.getObject("required_quantity");
-                ingredient.setQuantity(requiredQuantity == null ? null : resultSet.getDouble("required_quantity"));
                 ingredients.add(ingredient);
             }
             dbConnection.closeConnection(connection);
@@ -227,6 +226,7 @@ public class DataRetriever {
             throw new RuntimeException(e);
         }
     }
+     **/
 
 
     private String getSerialSequenceName(Connection conn, String tableName, String columnName)
