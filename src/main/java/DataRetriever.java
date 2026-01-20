@@ -190,9 +190,9 @@ public class DataRetriever {
         try (PreparedStatement ps = conn.prepareStatement(attachSql)) {
             for (DishIngredient di : dishIngredients) {
                 ps.setInt(1, dishId);
-                ps.setInt(2, di.getIdIngredient());
+                ps.setInt(2, di.getIngredient().getId());
                 ps.setDouble(3, di.getQuantityRequired());
-                ps.setObject(4, di.getUnit());
+                ps.setObject(4, di.getUnit().name());
                 ps.addBatch(); // Can be substitute ps.executeUpdate() but bad performance
             }
             ps.executeBatch();
