@@ -120,7 +120,40 @@ public class DataRetriever {
         }
     }
 
+    Ingredient findIngredientById(Integer id) {
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = null;
+        try {
+            connection = dbConnection.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    """
+                            select id as ingredient_id, 
+                                   name as ingredient_name, 
+                                   price,
+                                   category
+                            where id = ?;
+                            """);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
+            if (resultSet.next()) {
+                Ingredient ing = new Ingredient();
+                ing.setId(resultSet.getInt("ingredient_id"));
+                ing.setName(resultSet.getString("ingredient_name"));
+                ing.setPrice(resultSet.getObject("price") == null
+                        ? null : resultSet.getDouble("price"));
+                ing.setCategory(CategoryEnum.valueOf(resultSet.getString("category")));
+
+                return ing;
+            } else{
+                throw new RuntimeException("Ingredient not found " + id);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving ingredient " + id, e);
+        } finally {
+            dbConnection.closeConnection(connection);
+        }
+    }
 
     Ingredient saveIngredient(Ingredient toSave){
         String upsertIngredientSql = """
@@ -138,7 +171,7 @@ public class DataRetriever {
             Integer ingredientId;
             try (PreparedStatement ps = conn.prepareStatement(upsertIngredientSql)){
                 if(toSave.getId() != null){
-                    ps.setInt(1, toSave.getId())
+                    ps.setInt(1, toSave.getId());
                 } else {
                     ps.setInt(1, getNextSerialValue(conn, "ingredient", "id"));
                 }
