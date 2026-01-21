@@ -12,3 +12,14 @@ ALTER TABLE ingredient DROP COLUMN IF EXISTS id_dish;
 ALTER TABLE ingredient DROP COLUMN IF EXISTS required_quantity;
 
 ALTER TABLE dish RENAME COLUMN price TO selling_price;
+
+create type movement_type as enum('IN', 'OUT');
+
+create table stock_movement(
+    id serial primary key,
+    id_ingredient int references ingredien(id),
+    quantity numeric,
+    "type" movement_type,
+    unit unit_type,
+    creation_datetime timestamp
+);
