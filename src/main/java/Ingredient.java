@@ -1,10 +1,14 @@
+import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Ingredient {
     private Integer id;
     private String name;
-    private CategoryEnum category;
     private Double price;
+    private CategoryEnum category;
+    private List<StockMovement> stockMovementList;
 
     public Ingredient() {
     }
@@ -52,6 +56,14 @@ public class Ingredient {
         this.price = price;
     }
 
+    public List<StockMovement> getStockMovementList() {
+        return stockMovementList;
+    }
+
+    public void setStockMovementList(List<StockMovement> stockMovementList) {
+        this.stockMovementList = stockMovementList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -72,5 +84,21 @@ public class Ingredient {
                 ", category=" + category +
                 ", price=" + price +
                 '}';
+    }
+
+    public StockValue getStockValueAt(Instant t){
+        if(stockMovementList == null || stockMovementList.isEmpty()){
+            return new StockValue(0.0, UnitTypeEnum.KG);
+        }
+
+        UnitTypeEnum unit = stockMovementList.getFirst().getValue().getUnit();
+        double total = 0.0;
+
+        for(StockMovement stock : stockMovementList){
+            if(!stock.getCreationDatetime().isAfter(t)){
+                total += stock.getValue().getQuantity();
+            }
+        }
+        return new StockValue(total, unit);
     }
 }
