@@ -16,7 +16,7 @@ public class Dish {
         double totalCost = 0.0;
         for (DishIngredient di : dishIngredients) {
             if (di.getQuantityRequired() == null) {
-                throw new RuntimeException("Quantity required is null for ingredient " + di.getIdIngredient());
+                throw new RuntimeException("Quantity required is null for ingredient " + di.getIngredient().getId());
             }
             totalCost += di.getIngredient().getPrice() * di.getQuantityRequired();
         }

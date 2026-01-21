@@ -49,10 +49,20 @@ public class Main {
         updatedSalade.setName("Salade fraîche updated");
         updatedSalade.setDishType(DishTypeEnum.STARTER);
         updatedSalade.setSellingPrice(4000.0);
+        Ingredient tomate = new Ingredient();
+        tomate.setId(1);
+        tomate.setName("Tomate");
+        tomate.setPrice(600.0);
+        tomate.setCategory(CategoryEnum.VEGETABLE);
+        Ingredient salade = new Ingredient();
+        tomate.setId(2);
+        tomate.setName("Salade");
+        tomate.setPrice(600.0);
+        tomate.setCategory(CategoryEnum.VEGETABLE);
         System.out.println("\n--Add dishIngredient--");
         List<DishIngredient> dis = new ArrayList<>();
-        dis.add(new DishIngredient(1, 1, 0.25, UnitTypeEnum.KG));
-        dis.add(new DishIngredient(1, 2, 0.10, UnitTypeEnum.KG));
+        dis.add(new DishIngredient(updatedSalade, tomate, 0.25, UnitTypeEnum.KG));
+        dis.add(new DishIngredient(updatedSalade, salade, 0.10, UnitTypeEnum.KG));
         updatedSalade.setDishIngredients(dis);
 
         Dish saved = dataRetriever.saveDish(updatedSalade);
