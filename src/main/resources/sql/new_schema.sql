@@ -17,9 +17,14 @@ create type movement_type as enum('IN', 'OUT');
 
 create table stock_movement(
     id serial primary key,
-    id_ingredient int references ingredien(id),
+    id_ingredient int references ingredient(id),
     quantity numeric,
     "type" movement_type,
     unit unit_type,
     creation_datetime timestamp
 );
+
+-- for on conflict do nothing usage
+ALTER TABLE stock_movement
+    ADD CONSTRAINT unique_movement_per_ingredient_time
+        UNIQUE (id_ingredient, creation_datetime);
