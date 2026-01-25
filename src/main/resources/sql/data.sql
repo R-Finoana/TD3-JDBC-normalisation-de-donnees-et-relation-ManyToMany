@@ -30,11 +30,11 @@ values (1, 1, 1, 0.20, 'KG'),
        (4, 4, 4, 0.30, 'KG'),
        (5, 4, 5, 0.20, 'KG');
 
-update dish SET price=3500.00 where id=1;
-update dish SET price=12000.00 where id=2;
-update dish SET price=null where id=3;
-update dish SET price=8000.00 where id=4;
-update dish SET price=null where id=5;
+update dish SET selling_price=3500.00 where id=1;
+update dish SET selling_price=12000.00 where id=2;
+update dish SET selling_price=null where id=3;
+update dish SET selling_price=8000.00 where id=4;
+update dish SET selling_price=null where id=5;
 
 
 insert into stock_movement(id_ingredient, quantity, "type", unit, creation_datetime)
