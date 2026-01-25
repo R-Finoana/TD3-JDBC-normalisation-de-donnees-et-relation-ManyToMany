@@ -28,7 +28,7 @@ public class Main {
             System.out.println("Exception for Salade: " + e.getMessage());
         }
 
-        System.out.println("\n--Gross margin test--");
+        System.out.println("\n--Gross margin test that succeeds--");
         try {
             Dish poulet = dataRetriever.findDishById(2);
             System.out.println("Poulet grillé margin: " + poulet.getGrossMargin());  //should be 7500
@@ -36,6 +36,7 @@ public class Main {
             System.out.println("Exception for Poulet: " + e.getMessage());
         }
 
+        System.out.println("\n--Gross margin test that shows an exeption--");
         try {
             Dish riz = dataRetriever.findDishById(3);
             System.out.println("Riz margin: " + riz.getGrossMargin());
@@ -49,20 +50,20 @@ public class Main {
         updatedSalade.setName("Salade fraîche updated");
         updatedSalade.setDishType(DishTypeEnum.STARTER);
         updatedSalade.setSellingPrice(4000.0);
+        Ingredient laitue = new Ingredient();
+        laitue.setId(1);
+        laitue.setName("Laitue");
+        laitue.setPrice(800.0);
+        laitue.setCategory(CategoryEnum.VEGETABLE);
         Ingredient tomate = new Ingredient();
-        tomate.setId(1);
+        tomate.setId(2);
         tomate.setName("Tomate");
         tomate.setPrice(600.0);
         tomate.setCategory(CategoryEnum.VEGETABLE);
-        Ingredient salade = new Ingredient();
-        tomate.setId(2);
-        tomate.setName("Salade");
-        tomate.setPrice(600.0);
-        tomate.setCategory(CategoryEnum.VEGETABLE);
-        System.out.println("\n--Add dishIngredient--");
+        System.out.println("--Add dishIngredient--");
         List<DishIngredient> dis = new ArrayList<>();
+        dis.add(new DishIngredient(updatedSalade, laitue, 0.10, UnitTypeEnum.KG));
         dis.add(new DishIngredient(updatedSalade, tomate, 0.25, UnitTypeEnum.KG));
-        dis.add(new DishIngredient(updatedSalade, salade, 0.10, UnitTypeEnum.KG));
         updatedSalade.setDishIngredients(dis);
 
         Dish saved = dataRetriever.saveDish(updatedSalade);
