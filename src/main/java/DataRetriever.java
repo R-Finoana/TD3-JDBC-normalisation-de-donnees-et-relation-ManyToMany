@@ -156,41 +156,34 @@ public class DataRetriever {
     }
 
     Ingredient saveIngredient(Ingredient toSave){
-        String upsertIngredientSql = """
+
+    }
+
+    private Integer upsertIngredient(Connection conn, Ingredient ingredient){
+        String sql = """
                 INSERT INTO ingredient (id, name, price, category)
                 VALUES (?, ?, ?, ?::ingredient_category)
                 ON CONFLICT (id) DO UPDATE
-                SET name = EXCLUDED.name
-                    price = EXCLUDED.price
+                SET name = EXCLUDED.name,
+                    price = EXCLUDED.price,
                     category = ECLUDED.category
                 RETURNING id
                 """;
 
-        try (Connection conn = new DBConnection().getConnection();){
-            conn.setAutoCommit(false);
-            Integer ingredientId;
-            try (PreparedStatement ps = conn.prepareStatement(upsertIngredientSql)){
-                if(toSave.getId() != null){
-                    ps.setInt(1, toSave.getId());
-                } else {
-                    ps.setInt(1, getNextSerialValue(conn, "ingredient", "id"));
-                }
-                ps.setString(2, toSave.getName());
-                ps.setDouble(3, toSave.getPrice());
-                ps.setString(4, toSave.getCategory().name());
-                try(ResultSet rs = ps.executeQuery()){
-                    rs.next();
-                    ingredientId = rs.getInt(1);
-                }
-            }
+        try (PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setObject(1, ingredient.getId(), Types.INTEGER);
+            ps.setString(2, ingredient.getName());
+            ps.setDouble(3, ingredient.getPrice());
+            ps.setString(4, ingredient.getCategory().name());
 
-            conn.commit();
-            return findIngredientById(ingredientId);
+            try(ResultSet rs = ps.executeQuery()){
+                rs.next();
+                return rs.getInt("id");
+            }
         } catch (SQLException e){
             throw new RuntimeException(e);
         }
     }
-
     public List<Ingredient> createIngredients(List<Ingredient> newIngredients) {
         if (newIngredients == null || newIngredients.isEmpty()) {
             return List.of();
