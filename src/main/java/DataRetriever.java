@@ -201,6 +201,32 @@ public class DataRetriever {
             throw new RuntimeException(e);
         }
     }
+
+    private void saveNewStockMovements(Connection conn, Integer ingredientId, List<StockMovement> movements){
+        String sql = """
+                INSERT INTO stock_movement (id_ingredient, quantity, type, unit, creation_datetime)
+                VALUES (?, ?, ?::unit_type, ?)
+                ON CONFLICT(id_ingredient, creation_datetime) DO NOTHING
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql);){
+            for(StockMovement mvmt : movements){
+                if(mvmt.getId() != null){
+                    continue;
+                }
+                ps.setInt(1, ingredientId);
+                ps.setDouble(2, mvmt.getValue().getQuantity());
+                ps.setString(3, mvmt.getValue().getUnit().name());
+                ps.setTimestamp(4, Timestamp.from(mvmt.getCreationDatetime()));
+
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        } catch (SQLException e){
+            throw new RuntimeException("Error saving new stock movements ", e);
+        }
+    }
+
     public List<Ingredient> createIngredients(List<Ingredient> newIngredients) {
         if (newIngredients == null || newIngredients.isEmpty()) {
             return List.of();
