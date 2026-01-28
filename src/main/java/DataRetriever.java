@@ -156,7 +156,24 @@ public class DataRetriever {
     }
 
     Ingredient saveIngredient(Ingredient toSave){
+        if(toSave == null){
+            throw new RuntimeException("Ingredient can not be null");
+        }
+        try{
+            Connection conn = new DBConnection().getConnection();
+            conn.setAutoCommit(false);
 
+            Integer ingredientId = upsertIngredient(conn, toSave);
+
+            if(toSave.getStockMovementList() != null && !toSave.getStockMovementList().isEmpty()){
+                saveNewStockMovements(conn, ingredientId, toSave.getStockMovementList());
+            }
+
+            conn.commit();
+            return findIngredientById(ingredientId);
+        } catch (SQLException e){
+            throw new RuntimeException("Error saving ingredient", e);
+        }
     }
 
     private Integer upsertIngredient(Connection conn, Ingredient ingredient){
