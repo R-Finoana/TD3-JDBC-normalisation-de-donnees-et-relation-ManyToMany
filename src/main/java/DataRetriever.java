@@ -4,6 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataRetriever {
+    Order findOrderByReference(String reference) {
+        DBConnection dbConnection = new DBConnection();
+        try (Connection connection = dbConnection.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("""
+                    select id, reference, creation_datetime, "type", status from "order" where reference like ?""");
+
+            preparedStatement.setString(1, reference);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                Order order = new Order();
+                Integer idOrder = resultSet.getInt("id");
+                order.setId(idOrder);
+                order.setReference(resultSet.getString("reference"));
+                order.setCreationDatetime(resultSet.getTimestamp("creation_datetime").toInstant());
+                String orderTypeStr = resultSet.getString("type");
+                if (orderTypeStr != null) {
+                    order.setOrderType(OrderType.valueOf(orderTypeStr));
+                }
+                String statusStr = resultSet.getString("status");
+                if (statusStr != null) {
+                    order.setOrderStatus(OrderStatus.valueOf(statusStr));
+                }
+
+                order.setDishOrderList(findDishOrderByIdOrder(order.getId()));
+                return order;
+            }
+            throw new RuntimeException("Order not found with reference " + reference);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     Dish findDishById(Integer id) {
         DBConnection dbConnection = new DBConnection();
         Connection connection = dbConnection.getConnection();
