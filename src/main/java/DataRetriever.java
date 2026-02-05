@@ -1,7 +1,7 @@
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DataRetriever {
     Dish findDishById(Integer id) {
@@ -176,6 +176,27 @@ public class DataRetriever {
         }
     }
 
+
+    private void saveDishOrders(Connection conn, Integer orderId, List<DishOrder> dishOrderList){
+        String sql = """
+            INSERT INTO dish_order (id_order, id_dish, quantity)
+            VALUES (?, ?, ?)
+            RETURNING id;
+    """;
+
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            for(DishOrder dishOrder : dishOrderList){
+                ps.setInt(1, orderId);
+                ps.setInt(2, dishOrder.getDish().getId());
+                ps.setInt(3, dishOrder.getQuantity());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Integer upsertIngredient(Connection conn, Ingredient ingredient){
         String sql = """
                 INSERT INTO ingredient (id, name, price, category)
@@ -240,7 +261,7 @@ public class DataRetriever {
 
             for(DishIngredient di : dish.getDishIngredients()){
                 Ingredient ing = di.getIngredient();
-                double qtyRequired = di.getQuantity();
+                double qtyRequired = di.getQuantityRequired();
                 double totalQty = qtyOrdered * qtyRequired;
 
                 StockValue currentStock = ing.getStockValueAt(Instant.now());
