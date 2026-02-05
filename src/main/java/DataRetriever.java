@@ -202,6 +202,28 @@ public class DataRetriever {
         }
     }
 
+    Order saveOrder(Order orderToSave) {
+        if(orderToSave == null){
+            throw new IllegalArgumentException("Order cannot be null");
+        }
+
+        try (Connection conn = new DBConnection().getConnection()) {
+            conn.setAutoCommit(false);
+
+            checkStockSufficient(orderToSave);
+            Integer orderId = upsertOrder(conn, orderToSave);
+
+            saveDishOrders(conn, orderId,orderToSave.getDishOrderList());
+
+            deduceStockForOrder(conn, orderToSave);
+
+            conn.commit();
+            return findOrderByReference(orderToSave.getReference());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void saveNewStockMovements(Connection conn, Integer ingredientId, List<StockMovement> movements){
         String sql = """
                 INSERT INTO stock_movement (id_ingredient, quantity, type, unit, creation_datetime)
