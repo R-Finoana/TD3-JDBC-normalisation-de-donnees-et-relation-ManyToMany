@@ -224,6 +224,34 @@ public class DataRetriever {
         }
     }
 
+    private void checkStockSufficient(Order order) {
+        assert order != null;
+        if(order.getDishOrderList() == null || order.getDishOrderList().isEmpty()){
+            throw new IllegalArgumentException("Order cannot be null or empty");
+        }
+
+        for(DishOrder dishOrder : order.getDishOrderList()){
+            Dish dish = dishOrder.getDish();
+            int qtyOrdered = dishOrder.getQuantity();
+
+            if(dish.getDishIngredients() == null || dish.getDishIngredients().isEmpty()){
+                continue;
+            }
+
+            for(DishIngredient di : dish.getDishIngredients()){
+                Ingredient ing = di.getIngredient();
+                double qtyRequired = di.getQuantity();
+                double totalQty = qtyOrdered * qtyRequired;
+
+                StockValue currentStock = ing.getStockValueAt(Instant.now());
+
+                if(currentStock.getQuantity() < totalQty){
+                    throw new IllegalArgumentException("Insufficient stock for ingredient " + ing.getName());
+                }
+            }
+        }
+    }
+
     private Integer upsertOrder(Connection conn, Order order)  throws SQLException{
         String upsertOrderSql = """
                     INSERT INTO "oder" (id, reference, creation_datetime)
