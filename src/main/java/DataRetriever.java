@@ -224,6 +224,28 @@ public class DataRetriever {
         }
     }
 
+    private Integer upsertOrder(Connection conn, Order order)  throws SQLException{
+        String upsertOrderSql = """
+                    INSERT INTO "oder" (id, reference, creation_datetime)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT (id) DO UPDATE
+                    SET reference = EXCLUDED.reference,
+                        creation_datetime = EXCLUDED.creation_datetime
+                    RETURNING id
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(upsertOrderSql)) {
+            ps.setObject(1, order.getId(), Types.INTEGER);
+            ps.setString(2, order.getReference());
+            ps.setTimestamp(3, Timestamp.from(order.getCreationDatetime()));
+
+            try(ResultSet rs = ps.executeQuery()){
+                rs.next();
+                return rs.getInt(1);
+            }
+        }
+    }
+
     private void saveNewStockMovements(Connection conn, Integer ingredientId, List<StockMovement> movements){
         String sql = """
                 INSERT INTO stock_movement (id_ingredient, quantity, type, unit, creation_datetime)
