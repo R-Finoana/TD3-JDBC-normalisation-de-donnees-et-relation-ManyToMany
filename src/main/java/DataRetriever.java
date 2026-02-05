@@ -286,6 +286,10 @@ public class DataRetriever {
             throw new IllegalArgumentException("Order cannot be null");
         }
 
+        if(orderToSave.getOrderStatus() == OrderStatus.DELIVERED){
+            throw new IllegalArgumentException("Order cannot be delivered");
+        }
+
         if(orderToSave.getOrderType() == null){
             throw new IllegalArgumentException("Order type cannot be null");
         }
