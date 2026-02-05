@@ -287,7 +287,7 @@ public class DataRetriever {
         }
 
         if(orderToSave.getOrderStatus() == OrderStatus.DELIVERED){
-            throw new IllegalArgumentException("Order cannot be delivered");
+            throw new IllegalArgumentException("Order cannot be saved if it has already been delivered");
         }
 
         if(orderToSave.getOrderType() == null){
