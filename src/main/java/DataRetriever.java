@@ -286,6 +286,14 @@ public class DataRetriever {
             throw new IllegalArgumentException("Order cannot be null");
         }
 
+        if(orderToSave.getOrderType() == null){
+            throw new IllegalArgumentException("Order type cannot be null");
+        }
+
+        if(orderToSave.getOrderStatus() == null){
+            throw new IllegalArgumentException("Order status cannot be null");
+        }
+
         try (Connection conn = new DBConnection().getConnection()) {
             conn.setAutoCommit(false);
 
