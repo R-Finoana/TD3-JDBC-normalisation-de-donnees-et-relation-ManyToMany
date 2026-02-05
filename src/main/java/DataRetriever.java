@@ -236,7 +236,7 @@ public class DataRetriever {
 
             saveDishOrders(conn, orderId,orderToSave.getDishOrderList());
 
-            deduceStockForOrder(conn, orderToSave);
+            deductStockForOrder(conn, orderToSave);
 
             conn.commit();
             return findOrderByReference(orderToSave.getReference());
@@ -269,6 +269,49 @@ public class DataRetriever {
                 if(currentStock.getQuantity() < totalQty){
                     throw new IllegalArgumentException("Insufficient stock for ingredient " + ing.getName());
                 }
+            }
+        }
+    }
+
+    private void deductStockForOrder(Connection conn, Order order) throws SQLException {
+        Instant now = Instant.now();
+
+        for (DishOrder dishOrder : order.getDishOrderList()) {
+            Dish dish = dishOrder.getDish();
+            int qtyOrdered = dishOrder.getQuantity();
+
+            for (DishIngredient di : dish.getDishIngredients()) {
+                Ingredient ing = di.getIngredient();
+                double qtyPerDish = di.getQuantityRequired();
+                double totalDeduct = qtyPerDish * qtyOrdered;
+
+                StockMovement out = new StockMovement();
+                out.setType(MovementTypeEnum.OUT);
+                out.setValue(new StockValue(-totalDeduct, di.getUnit()));
+                out.setCreationDatetime(now);
+
+                insertStockMovement(conn, ing.getId(), out);
+            }
+        }
+    }
+
+    private void insertStockMovement(Connection conn, Integer ingredientId, StockMovement movement) throws SQLException {
+        String sql = """
+        INSERT INTO stock_movement (id_ingredient, quantity, type, unit, creation_datetime)
+        VALUES (?, ?, ?::movement_type, ?::unit_type, ?)
+        RETURNING id
+    """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ingredientId);
+            ps.setDouble(2, movement.getValue().getQuantity());
+            ps.setString(3, movement.getType().name());
+            ps.setString(4, movement.getValue().getUnit().name());
+            ps.setTimestamp(5, Timestamp.from(movement.getCreationDatetime()));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                movement.setId(rs.getInt(1));
             }
         }
     }
