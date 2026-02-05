@@ -28,3 +28,13 @@ create table stock_movement(
 ALTER TABLE stock_movement
     ADD CONSTRAINT unique_movement_per_ingredient_time
         UNIQUE (id_ingredient, creation_datetime);
+
+create type order_type as enum ('EAT_IN', 'TAKE_AWAY');
+
+alter table "order"
+    add column if not exists "type" order_type;
+
+create type order_status as enum ('CREATED', 'READY', 'DELIVERED');
+
+alter table "order"
+    add column if not exists status order_status;
