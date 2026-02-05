@@ -49,3 +49,8 @@ values (1, 5.0, 'IN', 'KG', '2024-01-05 08:00'),
        (5, 5.0, 'IN', 'KG', '2024-01-05 10:00'),
        (5, 0.2, 'OUT', 'KG', '2024-01-06 14:00');
 
+
+insert into "order" (id, reference, creation_datetime, "type", status)
+values (1, 'ORD100', '2024-01-05 10:00', 'TAKE_AWAY', 'DELIVERED'),
+       (2, 'ORD102', '2024-01-06 12:00', 'EAT_IN', 'CREATED');
+
