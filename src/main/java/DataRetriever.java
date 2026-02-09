@@ -349,6 +349,42 @@ public class DataRetriever {
         }
     }
 
+    private void detachOrders(Connection conn, Integer idOrder) {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM dish_order where id_order = ?")) {
+            ps.setInt(1, idOrder);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void attachOrders(Connection conn, Integer orderId, List<DishOrder> dishOrders)
+            throws SQLException {
+
+        if (dishOrders == null || dishOrders.isEmpty()) {
+            return;
+        }
+        String attachSql = """
+                    insert into dish_order (id, id_order, id_dish, quantity)
+                    values (?, ?, ?, ?)
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(attachSql)) {
+            int nextSerialValue = getNextSerialValue(conn, "dish_order", "id");
+            for (DishOrder dishOrder : dishOrders) {
+                ps.setInt(1, nextSerialValue);
+                ps.setInt(2, orderId);
+                ps.setInt(3, dishOrder.getDish().getId());
+                ps.setInt(4, dishOrder.getQuantity());
+                ps.addBatch();
+                nextSerialValue++;
+            }
+            ps.executeBatch();
+        }
+    }
+
+
     private void checkStockSufficient(Order order) {
         assert order != null;
         if(order.getDishOrderList() == null || order.getDishOrderList().isEmpty()){
