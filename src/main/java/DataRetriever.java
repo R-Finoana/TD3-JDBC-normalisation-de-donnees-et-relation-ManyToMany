@@ -384,7 +384,7 @@ public class DataRetriever {
         }
     }
 
-
+/*
     private void checkStockSufficient(Order order) {
         assert order != null;
         if(order.getDishOrderList() == null || order.getDishOrderList().isEmpty()){
@@ -455,32 +455,7 @@ public class DataRetriever {
             }
         }
     }
-
-    private Integer upsertOrder(Connection conn, Order order)  throws SQLException{
-        String upsertOrderSql = """
-                    INSERT INTO "oder" (id, reference, creation_datetime, "type", status)
-                    VALUES (?, ?, ?, ?::order_type, ?::order_status)
-                    ON CONFLICT (id) DO UPDATE
-                    SET reference = EXCLUDED.reference,
-                        creation_datetime = EXCLUDED.creation_datetime,
-                        "type" = EXCLUDED."type",
-                        status = EXCLUDED.status
-                    RETURNING id
-                """;
-
-        try (PreparedStatement ps = conn.prepareStatement(upsertOrderSql)) {
-            ps.setObject(1, order.getId(), Types.INTEGER);
-            ps.setString(2, order.getReference());
-            ps.setTimestamp(3, Timestamp.from(order.getCreationDatetime()));
-            ps.setString(4, order.getOrderType().name());
-            ps.setString(5, order.getOrderStatus().name());
-
-            try(ResultSet rs = ps.executeQuery()){
-                rs.next();
-                return rs.getInt(1);
-            }
-        }
-    }
+ */
 
     private void saveNewStockMovements(Connection conn, Integer ingredientId, List<StockMovement> movements){
         String sql = """
