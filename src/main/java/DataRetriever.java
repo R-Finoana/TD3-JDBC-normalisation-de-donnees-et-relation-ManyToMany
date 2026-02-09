@@ -1,3 +1,5 @@
+import org.postgresql.util.PSQLException;
+
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -290,6 +292,7 @@ public class DataRetriever {
             throw new IllegalArgumentException("Order cannot be saved if it has already been delivered");
         }
 
+        /**
         if(orderToSave.getOrderType() == null){
             throw new IllegalArgumentException("Order type cannot be null");
         }
@@ -297,20 +300,51 @@ public class DataRetriever {
         if(orderToSave.getOrderStatus() == null){
             throw new IllegalArgumentException("Order status cannot be null");
         }
+         **/
+
+
+        String upsertOrderSql = """
+                    INSERT INTO "order" (id, reference, creation_datetime)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT (id) DO NOTHING
+                    RETURNING id
+                """;
 
         try (Connection conn = new DBConnection().getConnection()) {
             conn.setAutoCommit(false);
 
-            checkStockSufficient(orderToSave);
-            Integer orderId = upsertOrder(conn, orderToSave);
-
-            saveDishOrders(conn, orderId,orderToSave.getDishOrderList());
-
-            deductStockForOrder(conn, orderToSave);
+            Integer orderId;
+            try (PreparedStatement ps = conn.prepareStatement(upsertOrderSql)) {
+                int nextSerialValue = getNextSerialValue(conn, "\"order\"", "id");
+                if (orderToSave.getId() != null) {
+                    ps.setInt(1, orderToSave.getId());
+                } else {
+                    ps.setInt(1, nextSerialValue);
+                }
+                ps.setString(2, orderToSave.getReference());
+                ps.setTimestamp(3, Timestamp.from(orderToSave.getCreationDatetime()));
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        orderId = rs.getInt(1);
+                    } else {
+                        orderId = orderToSave.getId() != null ? orderToSave.getId() : nextSerialValue;
+                    }
+                }
+            }
+            List<DishOrder> dishOrderList = orderToSave.getDishOrderList();
+            detachOrders(conn, orderId);
+            attachOrders(conn, orderId, dishOrderList);
 
             conn.commit();
             return findOrderByReference(orderToSave.getReference());
-        } catch (SQLException e) {
+        } catch (PSQLException e) {
+            if(e.getMessage().contains("duplicate key value violates unique constraint \"order_reference_unique\"")) {
+                throw new RuntimeException("Order already exists with reference " + orderToSave.getReference());
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
