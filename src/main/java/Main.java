@@ -1,8 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Instant.now;
+
 public class Main {
     public static void main(String[] args) {
+        /**
         // Log before changes
         DataRetriever dataRetriever = new DataRetriever();
         Dish dish = dataRetriever.findDishById(4
@@ -70,5 +73,20 @@ public class Main {
         System.out.println("Saved dish: " + saved);
         System.out.println("New cost: " + saved.getDishCost());
         System.out.println("New margin: " + saved.getGrossMargin());
+         **/
+        DataRetriever dataRetriever = new DataRetriever();
+        Order orderOne = dataRetriever.findOrderByReference("ORD100");
+        Order newOrder = new Order();
+        newOrder.setId(2);
+        newOrder.setReference("ORD102");
+        List<DishOrder> dishOrderList = orderOne.getDishOrderList();
+        DishOrder newDishOrder = new DishOrder();
+        newDishOrder.setDish(dataRetriever.findDishById(2));
+        newDishOrder.setQuantity(1);
+        dishOrderList.add(newDishOrder);
+        newOrder.setDishOrderList(dishOrderList);
+        newOrder.setCreationDatetime(now());
+        Order savedOrder = dataRetriever.saveOrder(newOrder);
+        System.out.println(savedOrder);
     }
 }
