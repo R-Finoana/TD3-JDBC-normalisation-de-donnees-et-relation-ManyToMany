@@ -658,7 +658,7 @@ public class DataRetriever {
 
     private void updateSequenceNextValue(Connection conn, String tableName, String columnName, String sequenceName) throws SQLException {
         String setValSql = String.format(
-                "SELECT setval('%s', (SELECT COALESCE(MAX(%s), 0) FROM %s))",
+                "SELECT setval('%s', COALESCE((SELECT MAX(%s) FROM %s), 1))",
                 sequenceName, columnName, tableName
         );
 
