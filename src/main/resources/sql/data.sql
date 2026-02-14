@@ -54,3 +54,9 @@ insert into "order" (id, reference, creation_datetime, "type", status)
 values (1, 'ORD100', '2024-01-05 10:00', 'TAKE_AWAY', 'DELIVERED'),
        (2, 'ORD102', '2024-01-06 12:00', 'EAT_IN', 'CREATED');
 
+select unit, stock_movement.id_ingredient,
+       sum(CASE WHEN stock_movement.type='OUT' THEN (stock_movement.quantity*(-1)) ELSE stock_movement.quantity END) as actual_quantity
+        from stock_movement join ingredient
+        on stock_movement.id_ingredient = ingredient.id
+        where stock_movement.creation_datetime<='2024-01-06 13:10:00' and ingredient.id=1
+        group by (id_ingredient, stock_movement.unit);
