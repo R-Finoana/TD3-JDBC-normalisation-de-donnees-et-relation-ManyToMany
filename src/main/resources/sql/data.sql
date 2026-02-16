@@ -59,3 +59,14 @@ select unit, stock_movement.id_ingredient,
         from stock_movement
         where stock_movement.creation_datetime<='2024-01-06 13:10:00' and stock_movement.id_ingredient=1
         group by (id_ingredient, stock_movement.unit);
+
+select
+    dish.id,
+    dish.name,
+    sum(ingredient.price*dish_ingredient.quantity_required)
+from dish
+         join dish_ingredient
+              on dish.id = dish_ingredient.id_dish
+         join ingredient
+              on ingredient.id = dish_ingredient.id_ingredient
+group by dish.id, dish.name;
