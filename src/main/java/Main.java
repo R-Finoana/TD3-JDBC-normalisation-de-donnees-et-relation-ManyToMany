@@ -94,11 +94,16 @@ public class Main {
 
         StockValue stockDB = dataRetriever.getStockValueAt(moment, 1);
 
-        System.out.println("=== Stock via DATABASE-SIDE ===");
+        System.out.println("\n=== Stock via DATABASE-SIDE ===");
         System.out.println(stockDB);
 
-        System.out.println("=== Dish cost ===");
+        System.out.println("\n=== Dish cost ===");
         Double cost = dataRetriever.getDishCost(1);
         System.out.printf("Dish cost for dish with id ingredient %d = %.2f%n", 1, cost);
+
+
+        System.out.println("\n=== Get gross margin ===");
+        Double margin = dataRetriever.getGrossMargin(1);
+        System.out.printf("Gross margin for dish with id %-2d  = %8.2f%n", 1, margin);
     }
 }
