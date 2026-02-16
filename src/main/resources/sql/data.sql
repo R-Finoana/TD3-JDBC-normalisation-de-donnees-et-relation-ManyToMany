@@ -63,7 +63,7 @@ select unit, stock_movement.id_ingredient,
 select
     dish.id,
     dish.name,
-    sum(ingredient.price*dish_ingredient.quantity_required)
+    sum(ingredient.price*dish_ingredient.quantity_required) as total_cost
 from dish
          join dish_ingredient
               on dish.id = dish_ingredient.id_dish
