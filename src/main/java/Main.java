@@ -1,3 +1,4 @@
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,5 +89,12 @@ public class Main {
         newOrder.setCreationDatetime(now());
         Order savedOrder = dataRetriever.saveOrder(newOrder);
         System.out.println(savedOrder);
+
+        Instant moment = Instant.parse("2025-02-15T14:30:00Z");
+
+        StockValue stockDB = dataRetriever.getStockValueAt(moment, 1);
+
+        System.out.println("=== Stock via DATABASE-SIDE ===");
+        System.out.println(stockDB);
     }
 }
