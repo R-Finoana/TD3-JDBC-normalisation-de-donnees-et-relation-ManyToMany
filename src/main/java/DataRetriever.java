@@ -411,6 +411,42 @@ public class DataRetriever {
         return new StockValue(0.0, UnitTypeEnum.KG);
     }
 
+    public Double getDishCost(Integer dishId) {
+        if (dishId == null) {
+            return 0.0;
+        }
+
+        String sql = """
+                select
+                    dish.id,
+                    dish.name,
+                    sum(ingredient.price*dish_ingredient.quantity_required) as total_cost
+                from dish
+                join dish_ingredient
+                on dish.id = dish_ingredient.id_dish
+                join ingredient
+                on ingredient.id = dish_ingredient.id_ingredient
+                group by dish.id, dish.name;
+                """;
+
+        try(Connection conn = new DBConnection().getConnection(); PreparedStatement ps = conn.prepareStatement(sql);){
+            ps.setInt(1, dishId);
+
+            try(ResultSet rs = ps.executeQuery();){
+                if(rs.next()){
+                    double value = rs.getDouble("total_cost");
+                    if(rs.wasNull()){
+                        return 0.0;
+                    }
+                    return value;
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error retrieving dish cost "+ dishId, e);
+        }
+        return 0.0;
+    }
+
 /*
     private void checkStockSufficient(Order order) {
         assert order != null;
