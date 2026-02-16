@@ -71,3 +71,12 @@ from dish
               on ingredient.id = dish_ingredient.id_ingredient
         where dish.id=1
 group by dish.id, dish.name;
+
+select dish.selling_price-sum(ingredient.price*dish_ingredient.quantity_required) as gross_margin
+from dish
+         join dish_ingredient
+              on dish.id = dish_ingredient.id_dish
+         join ingredient
+              on ingredient.id = dish_ingredient.id_ingredient
+where dish.id = ?
+group by dish.id, dish.selling_price;
