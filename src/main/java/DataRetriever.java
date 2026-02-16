@@ -384,6 +384,33 @@ public class DataRetriever {
         }
     }
 
+    public StockValue getStockValueAt(Instant t, Integer ingredientIdentifier) {
+        String sql= """
+                select 
+                    unit,
+                    stock_movement.id_ingredient,
+                    sum(CASE WHEN stock_movement.type='OUT' THEN (stock_movement.quantity*(-1)) ELSE stock_movement.quantity END) as actual_quantity
+                    from stock_movement
+                    where stock_movement.creation_datetime<= ? 
+                    and stock_movement.id_ingredient= ?
+                    group by (id_ingredient, stock_movement.unit);
+                """;
+
+        try(Connection conn = new DBConnection().getConnection(); PreparedStatement ps = conn.prepareStatement(sql);){
+            ps.setTimestamp(1, Timestamp.from(t));
+            ps.setInt(2, ingredientIdentifier);
+
+            try(ResultSet rs = ps.executeQuery();){
+                if (rs.next()){
+                    return new StockValue(rs.getDouble("actual_quantity"), UnitTypeEnum.valueOf(rs.getString("unit")));
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error while retrieving stock", e);
+        }
+        return new StockValue(0.0, UnitTypeEnum.KG);
+    }
+
 /*
     private void checkStockSufficient(Order order) {
         assert order != null;
