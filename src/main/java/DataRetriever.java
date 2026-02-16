@@ -426,6 +426,7 @@ public class DataRetriever {
                 on dish.id = dish_ingredient.id_dish
                 join ingredient
                 on ingredient.id = dish_ingredient.id_ingredient
+                where dish.id = ?
                 group by dish.id, dish.name;
                 """;
 
