@@ -96,5 +96,9 @@ public class Main {
 
         System.out.println("=== Stock via DATABASE-SIDE ===");
         System.out.println(stockDB);
+
+        System.out.println("=== Dish cost ===");
+        Double cost = dataRetriever.getDishCost(1);
+        System.out.printf("Dish cost for dish with id ingredient %d = %.2f%n", 1, cost);
     }
 }
