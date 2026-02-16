@@ -448,6 +448,35 @@ public class DataRetriever {
         return 0.0;
     }
 
+    public Double getGrossMargin(Integer dishId){
+        String sql = """
+                select dish.selling_price-sum(ingredient.price*dish_ingredient.quantity_required) as gross_margin
+                from dish
+                join dish_ingredient
+                on dish.id = dish_ingredient.id_dish
+                join ingredient
+                on ingredient.id = dish_ingredient.id_ingredient
+                where dish.id = ?
+                group by dish.id, dish.selling_price;
+                """;
+
+        try(Connection conn = new DBConnection().getConnection(); PreparedStatement ps = conn.prepareStatement(sql);){
+            ps.setInt(1, dishId);
+            try(ResultSet rs = ps.executeQuery();){
+                if(rs.next()){
+                    Double grossMargin = rs.getDouble("gross_margin");
+                    if(rs.wasNull()){
+                        return 0.0;
+                    }
+                    return grossMargin;
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException("Error while retrieving dish gross margin "+dishId, e);
+        }
+        return 0.0;
+    }
+
 /*
     private void checkStockSufficient(Order order) {
         assert order != null;
